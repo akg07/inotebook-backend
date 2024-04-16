@@ -74,4 +74,26 @@ router.post('/update-note/:id', fetchuser, async (req, res) => {
   }
 })
 
+// Delete a notes using post : GET "api/notes/delete-note" : Login required
+router.post('/delete-note/:id', fetchuser, async (req, res) => {
+  try{
+    // Find the note to be updated and delete it
+    let note = await Notes.findById(req.params.id);
+    if(!note) {
+      res.status(404).send("Note Not Found");
+    }
+
+    if(note.user.toString() !== req.user.id) {
+      res.status(401).send("Unauthorized Note access");
+    }
+
+    note = await Notes.findByIdAndDelete(req.params.id)
+    res.send({message: "Notes deleted Successfully"});
+    
+  }catch(error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+})
+
 module.exports = router;

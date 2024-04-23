@@ -25,7 +25,7 @@ router.post('/create-user', [
     // check weather user with email exists.
     let user = await User.findOne({email: req.body.email});
     if(user) {
-        return res.status(400).json({error: "User with emailId already exists"});
+        return res.status(400).json({error: "User with emailId already exists", success: false});
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -46,7 +46,7 @@ router.post('/create-user', [
 
     const authToken = jwt.sign(data, JWT_SECERT);
 
-    res.send({authToken, message: "User created successfully"})
+    res.send({authToken, message: "User created successfully", success: true})
   }catch(ex) {
     console.error(ex.message);
     res.status(500).send("Internal server error");
@@ -72,13 +72,13 @@ router.post('/login', [
     let user = await User.findOne({email});
 
     if(!user) {
-      return res.status(400).json({error: "Incorrect email/password"});
+      return res.status(400).json({error: "Incorrect email/password", success: false});
     }
 
     const passwordCompare = await bcrypt.compare(password, user.password);
 
     if(!passwordCompare) {
-      return res.status(400).json({error: "Incorrect email/password"});
+      return res.status(400).json({error: "Incorrect email/password", success: false});
     }
 
     const data = {
@@ -89,7 +89,7 @@ router.post('/login', [
 
     const authToken = jwt.sign(data, JWT_SECERT);
 
-    res.send({authToken, message: "Login successfully"});
+    res.send({authToken, message: "Login successfully", success: true});
 
   }catch(error) {
     console.error(ex.message);
